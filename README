@@ -58,10 +58,11 @@ Much cleaner.
 
 == Usage
 
-In order to turn an undecorated form built with the standard <tt>FormBuilder</tt>,
-all you need to do is replace your call to <tt>form_for<tt> with a call to
-<tt>labelled_form_for</tt>. The builder object passed to your block will wrap
-all the standard Rails helper methods, adding a div tag and a label:
+In order to turn an undecorated form built with the standard <tt>FormBuilder</tt>
+into a form with labels and wrapped in div tags, all you need to do is
+replace your call to <tt>form_for<tt> with a call to <tt>labelled_form_for</tt>.
+The builder object passed to your block will wrap all the standard Rails
+helper methods, adding a div tag and a label:
 
   <% labelled_form_for :recipe, @recipe do |f| %>
     <%= f.text_field :title %>
@@ -70,7 +71,7 @@ all the standard Rails helper methods, adding a div tag and a label:
 Most methods also understand one extra option: <tt>:label</tt>, which sets the label for
 that field:
 
-  <%= f.text_field :address, :label => 'Mailing Address' %>
+  <%= f.text_field :address, :label => 'Mailing Address:' %>
 
 However, labels can often be guessed by the field name, so specifying a
 label may not be necessary.
