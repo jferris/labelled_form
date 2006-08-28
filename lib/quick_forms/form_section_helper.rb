@@ -61,6 +61,14 @@ module ActionView #:nodoc:
 			def section (options = {}, &proc) #:yields: FormSectionBuilder/FormBuilder
 				@template.send(:form_section_for, @object_name, @object, :builder => self.class, &proc)
 			end
+			
+			# Creates a section in this form, using this builder's class as the builder.
+			# The builder will use the specified object as the target.
+			# 
+			# See <tt>FormSectionHelper#form_section</tt>.
+			def section_for (object_name, object, options = {}, &proc) #:yields: FormSectionBuilder/FormBuilder
+				@template.send(:form_section_for, object_name, object, :builder => self.class, &proc)
+			end
 
 		end
 		
