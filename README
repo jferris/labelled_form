@@ -1,4 +1,103 @@
-QuickForms
-==========
+= Quick Forms
 
-Description goes here
+== Purpose
+
+This plugin was designed to increase productivity and reduce repetition
+when creating forms. It should also aid in creating forms that are easy
+to style with CSS, without adding a lot of meaningless markup to your
+views.
+
+== Example
+
+A typical Rails form might look like this:
+
+  <% form_for :person, @person do |f| %>
+    <h1>My Information</h1>
+    <div class="section">
+      <div class="section_info">
+        <p>Please enter your personal details.</p>
+      </div>
+      <div class="section_body">
+	    <div class="field"><label for="person_name">Name:</label>
+        <%= f.text_field :name, :class => :text %></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section_info">
+        <p>Please describe your preferences.</p>
+      </div>
+      <div class="section_body">
+        <div class="boolean_field"><%= f.check_box :is_subscribed %>
+        <label for="person_is_subscribed">Subscribe to newsletter</label></div>
+      </div>
+    </div>
+  <% end %>
+  
+...only longer. The same form using Quick Forms would look like this:
+
+  <% labelled_form_for :person, @person, :title => 'My Information' do |f| %>
+    <% f.section |s| %>
+      <% s.info do %>
+        <p>Please enter your personal details.</p>
+      <% end>
+      <% s.body do %>
+        <%= s.text_field :name %>
+      <% end %>
+    <% end %>
+    <% f.section |s| %>
+      <% s.info do %>
+        <p>Please describe your preferences.</p>
+      <% end %>
+      <% s.body do %>
+        <%= s.check_box :is_subscribed, :label => 'Subscribe to newsletter' %>
+      <% end %>
+    <% end %>
+  <% end %>
+  
+Much cleaner.
+
+== Usage
+
+In order to turn an undecorated form built with the standard <tt>FormBuilder</tt>,
+all you need to do is replace your call to <tt>form_for<tt> with a call to
+<tt>labelled_form_for</tt>. The builder object passed to your block will wrap
+all the standard Rails helper methods, adding a div tag and a label:
+
+  <% labelled_form_for :recipe, @recipe do |f| %>
+    <%= f.text_field :title %>
+  <% end %>
+
+Most methods also understand one extra option: <tt>:label</tt>, which sets the label for
+that field:
+
+  <%= f.text_field :address, :label => 'Mailing Address' %>
+
+However, labels can often be guessed by the field name, so specifying a
+label may not be necessary.
+
+Quick Forms also helps you split your forms into sections:
+
+  <% f.section do |s| %>
+    <% s.info do %>
+    	<p>General Information</p>
+    <% end %>
+    <% s.body do %>
+    	<%= s.text_field :title %>
+    	<%= s.text_area_field :ingredients %>
+    <% end %>
+  <% end %>
+  
+The object passed to a section's block is a <tt>FormBuilder</tt> object, so
+you can use builder methods on it. In fact, if a particular section of your
+form uses a different object, you can use <tt>section_for</tt>:
+
+  <% f.section_for :permissions, @person.permissions do |s| %>
+    <% s.info do %>
+    	<p>Permissions</p>
+    <% end %>
+    <% s.body do %>
+      <%= s.check_box :is_admin, :label => 'This user is an administrator %>
+    <% end %>
+  <% end %>
+
+The builder passed to section_for uses the specified object as the target.
