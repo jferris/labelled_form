@@ -89,10 +89,9 @@ module ActionView #:nodoc:
 			# 
 			# See <tt>labelled_check_box_tag</tt>.
 			def labelled_check_box (object_name, method, options = {}, checked_value = "1", unchecked_value = "0")
-				options = options.stringify_keys
-				caption = options.delete('label') || (method.to_s.humanize + "?")
-				label_options = options.delete('label_options') || {}
-				input_options = options.delete('input') || {}
+				caption = options.delete(:label) || (method.to_s.humanize + "?")
+				label_options = options.delete(:label_options) || {}
+				input_options = options.delete(:input) || {}
 				InstanceTag.new(object_name, method, self, nil,
 								options.delete(:object)).to_labelled_check_box_tag(caption, label_options, input_options, options, checked_value, unchecked_value)
 			end
