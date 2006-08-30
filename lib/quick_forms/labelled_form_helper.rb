@@ -89,7 +89,7 @@ module ActionView #:nodoc:
 			# See <tt>labelled_check_box_tag</tt>.
 			def labelled_check_box (object_name, method, options = {}, checked_value = "1", unchecked_value = "0")
 				options = options.stringify_keys
-				caption = options.delete('label')
+				caption = options.delete('label') || (method.to_s.humanize + "?")
 				label_options = options.delete('label_options') || {}
 				input_options = options.delete('input') || {}
 				InstanceTag.new(object_name, method, self, nil,
@@ -140,8 +140,10 @@ module ActionView #:nodoc:
 			# See <tt>LabelledFormHelper#labelled_field</tt>.
 			def labelled_field_for (method, content = nil, options = {}, &proc)
 				# TODO: error checking
+				options = options.stringify_keys
 				options['id'] ||= "#{@object_name}_#{method}_field"
 				caption = options.delete('label') || method.to_s.humanize + ":"
+				options['class'] = options['class'] ? "#{options['class']} value_field" : 'value_field'
 				@template.send(:labelled_field, caption, content, "#{@object_name}_#{method}", options, &proc)
 			end
 			
@@ -155,15 +157,17 @@ module ActionView #:nodoc:
 			# 
 			# Like <tt>fields_for</tt>, <tt>labelled_field</tt> must be called in a
 			# ERb evaluation block, not a ERb output block. So that's <% %>, not <%= %>.
-			def labelled_field (methods, label = nil, options = {}, &proc)
+			def labelled_field (methods, label = nil, content = nil, options = {}, &proc)
 				# TODO: error checking
 				
 				methods ||= []
 				label ||= methods.first.to_s.humanize + ":"
 				
-				options[:params] = FormBuilder.new(@object_name, @object, @template, {}, proc)
-				options[:wrap] = [%{<span class="multi_input">}, "</span>"]
-				@template.send(:labelled_field, label, nil, nil, options, &proc)
+				options = options.stringify_keys
+				options['params'] = FormBuilder.new(@object_name, @object, @template, {}, proc)
+				options['wrap'] = [%{<span class="multi_input">}, "</span>"]
+				options['class'] = options['class'] ? "#{options['class']} multi_field" : 'multi_field'
+				@template.send(:labelled_field, label, content, nil, options, &proc)
 			end
 			
 			# Creates a labelled check box.
@@ -201,29 +205,39 @@ module ActionView #:nodoc:
 			(field_helpers - %w(check_box radio_button) +
 			%w(date_select datetime_select)
 			).each do |selector|
-				if %w(text_field password_field).include?(selector)
-					css_class_setter = <<-end_src
-						options = options.symbolize_keys
-						options[:class] = options[:class] ? "\#{options[:class]} text" : 'text'
-					end_src
+				if %w(date_select datetime_select).include?(selector)
+					src = <<-end_src
+		        		def #{selector}(method, options = {})
+							wrap_input(method, options.delete(:label), options.delete(:field_options), @template.send(#{selector.inspect}, @object_name, method, options.merge(:object => @object)), true)
+						end
+			        end_src
 				else
-					css_class_setter = ''
-				end
-				src = <<-end_src
-	        		def #{selector}(method, options = {})
-	        			#{css_class_setter}
-						wrap_input(method, options.delete(:label), options.delete(:field_options), @template.send(#{selector.inspect}, @object_name, method, options.merge(:object => @object)))
+					if %w(text_field password_field).include?(selector)
+						css_class_setter = <<-end_src
+							options = options.symbolize_keys
+							options[:class] = options[:class] ? "\#{options[:class]} text" : 'text'
+						end_src
+					else
+						css_class_setter = ''
 					end
-		        end_src
+					src = <<-end_src
+		        		def #{selector}(method, options = {})
+		        			#{css_class_setter}
+							wrap_input(method, options.delete(:label), options.delete(:field_options), @template.send(#{selector.inspect}, @object_name, method, options.merge(:object => @object)), false)
+						end
+			        end_src
+				end
 				class_eval src, __FILE__, __LINE__
 			end
 			
 			private
 			
-			def wrap_input (method, caption, field_options, content) #:nodoc:
+			def wrap_input (method, caption, field_options, content, is_multi) #:nodoc:
 				field_options ||= {}
 				field_options.stringify_keys!
 				field_options['label'] ||= caption
+				is_multi ?
+				labelled_field([method], caption, content, field_options) :
 				labelled_field_for(method, content, field_options)
 			end
 			

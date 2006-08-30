@@ -13,7 +13,7 @@ class LabelledFormBuilderTest < Test::Unit::TestCase
 			:tag => 'form',
 			:child => {
 				:tag => 'div',
-				:attributes => {:class => 'field'},
+				:attributes => {:class => 'value_field field'},
 				:child => {
 					:tag => 'label',
 					:attributes => {:for => 'var_name'},
@@ -52,7 +52,7 @@ class LabelledFormBuilderTest < Test::Unit::TestCase
 		
 		assert_tag({
 			:tag => 'div',
-			:attributes => {:class => 'field'},
+			:attributes => {:class => 'multi_field field'},
 			:child => {
 				:tag => 'label',
 				:attributes => {:for => nil},
@@ -109,10 +109,12 @@ class LabelledFormBuilderTest < Test::Unit::TestCase
 				# and also replaces the long, useless error from assert_tag
 				assertions << lambda do
 					begin
+						field_class = %w(date_select datetime_select).include?(helper) ?
+						'multi_field' : 'value_field'
 						assert_tag({
 							:tag => 'div',
-							:attributes => {:class => 'field'},
-							:child => {:tag => tag}
+							:attributes => {:class => "#{field_class} field"},
+							:descendant => {:tag => tag}
 						})
 					rescue Test::Unit::AssertionFailedError => e
 						if e.message =~ /expected tag/
@@ -202,7 +204,7 @@ class LabelledFormBuilderTest < Test::Unit::TestCase
 			:child => {
 				:tag => 'label',
 				:attributes => {:for => 'var_name'},
-				:content => 'Name:'
+				:content => 'Name?'
 			}
 		})
 	end

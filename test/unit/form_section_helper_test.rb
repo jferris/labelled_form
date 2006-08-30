@@ -149,7 +149,7 @@ class FormSectionHelperTest < Test::Unit::TestCase
 			:descendant => {
 				:tag => 'div',
 				:attributes => {
-					:class => 'field',
+					:class => 'value_field field',
 					:id => 'var_name_field'
 				}
 			}
