@@ -44,6 +44,15 @@ module ActionView #:nodoc:
 				concat('</form>', proc.binding)
 			end
 			
+			# Calls <tt>fields_for</tt> with <tt>LabelledFormBuilder</tt> as a builder.
+			# This wraps each of the built-in Rails helper methods with a call to
+			# <tt>labelled_field</tt>, which adds a label and wraps the field
+			# in a div tag.
+			def labelled_fields_for (object_name, *args, &proc)
+				raise ArgumentError, "Missing block" unless block_given?
+				fields_for(object_name, *(args << {:builder => LabelledFormBuilder}), &proc)
+			end
+			
 			# Wraps <tt>content</tt> with a div tag and adds a label.
 			# Parameters:
 			# 

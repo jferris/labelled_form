@@ -23,6 +23,24 @@ class LabelledFormBuilderTest < Test::Unit::TestCase
 		})
 	end
 	
+	def test_labelled_fields_for
+		template = <<-end_template
+			<% labelled_fields_for :var do |f| %>
+			<%= f.text_field :name %>
+			<% end %>
+		end_template
+		render(template, :name => 'test')
+		assert_tag({
+			:tag => 'div',
+			:attributes => {:class => 'value_field field'},
+			:child => {
+				:tag => 'label',
+				:attributes => {:for => 'var_name'},
+				:content => 'Name:'
+			}
+		})
+	end
+	
 	def test_labelled_field
 		template = <<-end_template
 			<%= labelled_field 'Test:', '<span>content</span>' %>
