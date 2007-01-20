@@ -165,6 +165,7 @@ module ActionView #:nodoc:
 				caption = options.delete('label') || method.to_s.humanize + ":"
 				options['class'] = options['class'] ? "#{options['class']} value_field" : 'value_field'
 				options['class'] << ' field_with_errors' if @object.respond_to?(:errors) && @object.errors.on(method)
+				options['class'] << ' required_field' if @object.respond_to?(:attribute_required?) && @object.attribute_required?(method)
 				@template.send(:labelled_field, caption, content, "#{@object_name}_#{method}", options, &proc)
 			end
 			
@@ -187,6 +188,7 @@ module ActionView #:nodoc:
 				options['wrap'] = [%{<span class="multi_input">}, "</span>"]
 				options['class'] = options['class'] ? "#{options['class']} multi_field" : 'multi_field'
 				options['class'] << ' field_with_errors' if @object.respond_to?(:errors) && methods.find {|method| @object.errors.on(method) }
+				options['class'] << ' required_field' if @object.respond_to?(:attribute_required?) && methods.find {|method| @object.attribute_required?(method) }
 				@template.send(:labelled_field, label, content, nil, options, &proc)
 			end
 			

@@ -46,7 +46,7 @@ class Test::Unit::TestCase
 		@response	= ActionController::TestResponse.new
 		
 		@controller.template_string = template
-		@controller.var = OpenStruct.new(var)
+		@controller.var = var.is_a?(Hash) ? OpenStruct.new(var) : var
 		
 		get :test
 		assert_response :success

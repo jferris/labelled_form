@@ -309,6 +309,36 @@ class LabelledFormBuilderTest < Test::Unit::TestCase
 			:attributes => {:class => 'multi_field field_with_errors field'}
 		})
 	end
+	
+	def test_required_attributes
+		template = <<-end_template
+			<% labelled_fields_for :var, @var do |f| %>
+			<%= f.text_field :name %>
+			<% end %>
+		end_template
+		render(template, Person.new)
+		
+		assert_tag({
+			:tag => 'div',
+			:attributes => {:class => 'value_field required_field field'}
+		})
+	end
+
+	def test_required_attributes_with_multi_field
+		template = <<-end_template
+			<% labelled_fields_for :var, @var do |f| %>
+			<% f.field :name do %>
+			Field
+			<% end %>
+			<% end %>
+		end_template
+		render(template, Person.new)
+		
+		assert_tag({
+			:tag => 'div',
+			:attributes => {:class => 'multi_field required_field field'}
+		})
+	end
 
 	class Errors
 	
