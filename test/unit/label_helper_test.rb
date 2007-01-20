@@ -16,7 +16,7 @@ class LabelHelperTest < Test::Unit::TestCase
 		result = render(%{<%= label_tag(nil, "Mailing Address:") %>})
 		assert_tag :tag => 'label',
 		:attributes => {:for => nil},
-		:content => 'Address:'
+		:content => 'Mailing Address:'
 		
 		result = render(%{<%= label_tag(:address, "Mailing Address:", :class => 'test') %>})
 		assert_tag :tag => 'label',
