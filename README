@@ -102,3 +102,14 @@ form uses a different object, you can use <tt>section_for</tt>:
   <% end %>
 
 The builder passed to section_for uses the specified object as the target.
+
+== Error handling
+
+If a field has error messages, the "field_with_errors" CSS class is added to
+the div tag for that field. Each field is checked for errors when using
+LabelledFormBuilder#field.
+
+== Required fields
+
+If a model requires an attribute using validates_presence_of, a field that
+edits that attribute will have the "required_field" CSS class on its div tag.
