@@ -140,6 +140,17 @@ module ActionView #:nodoc:
 				content_tag('div', check_box + label, div_options)
 			end
 			
+			# Allows disabling the built-in Rails forms error-handling
+			
+			@@error_wrapping_enabled = true
+			cattr_accessor :error_wrapping_enabled
+			
+			def error_wrapping_with_toggle (html_tag, has_error)
+				error_wrapping_enabled ? error_wrapping_without_toggle(html_tag, has_error) : html_tag
+			end
+
+			alias_method_chain :error_wrapping, :toggle
+			
 		end
 		
 		# Extends the build-in Rails <tt>FormBuilder</tt>
@@ -217,7 +228,7 @@ module ActionView #:nodoc:
 				if %w(date_select datetime_select).include?(selector)
 					src = <<-end_src
 		        		def #{selector}(method, options = {})
-							wrap_input(method, options.delete(:label), options.delete(:field_options), @template.send(#{selector.inspect}, @object_name, method, options.merge(:object => @object)), true)
+							without_error_wrapping { wrap_input(method, options.delete(:label), options.delete(:field_options), @template.send(#{selector.inspect}, @object_name, method, options.merge(:object => @object)), true) }
 						end
 			        end_src
 				else
@@ -232,7 +243,7 @@ module ActionView #:nodoc:
 					src = <<-end_src
 		        		def #{selector}(method, options = {})
 		        			#{css_class_setter}
-							wrap_input(method, options.delete(:label), options.delete(:field_options), @template.send(#{selector.inspect}, @object_name, method, options.merge(:object => @object)), false)
+		        			without_error_wrapping { wrap_input(method, options.delete(:label), options.delete(:field_options), @template.send(#{selector.inspect}, @object_name, method, options.merge(:object => @object)), false) }
 						end
 			        end_src
 				end
@@ -248,6 +259,14 @@ module ActionView #:nodoc:
 				is_multi ?
 				labelled_field([method], caption, content, field_options) :
 				labelled_field_for(method, content, field_options)
+			end
+			
+			def without_error_wrapping
+				old_error_wrapping_enabled = InstanceTag.error_wrapping_enabled
+				InstanceTag.error_wrapping_enabled = false
+				result = yield
+				InstanceTag.error_wrapping_enabled = old_error_wrapping_enabled
+				result
 			end
 			
 			alias_method :field_for, :labelled_field_for
