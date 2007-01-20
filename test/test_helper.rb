@@ -56,6 +56,7 @@ class Test::Unit::TestCase
 
 end
 
+require 'labelled_form'
 require 'schema'
 require 'models'
 
@@ -66,8 +67,6 @@ ActiveRecord::Base.establish_connection(
 	:username	=> 'root',
 	:password	=> ''
 )
-
-require 'labelled_form'
 
 DatabaseSchema.verbose = false
 begin
