@@ -33,7 +33,7 @@ A typical Rails form might look like this:
     </div>
   <% end %>
   
-...only longer. The same form using Quick Forms would look like this:
+...only longer. The same form using labelled_form would look like this:
 
   <% labelled_form_for :person, @person, :title => 'My Information' do |f| %>
     <% f.section |s| %>
@@ -76,7 +76,7 @@ that field:
 However, labels can often be guessed by the field name, so specifying a
 label may not be necessary.
 
-Quick Forms also helps you split your forms into sections:
+labelled_form also helps you split your forms into sections:
 
   <% f.section do |s| %>
     <% s.info do %>
