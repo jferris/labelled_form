@@ -280,4 +280,46 @@ class LabelledFormBuilderTest < Test::Unit::TestCase
 		})
 	end
 	
+	def test_value_field_with_errors
+		template = <<-end_template
+			<% labelled_fields_for :var, @var do |f| %>
+			<%= f.text_field :name %>
+			<% end %>
+		end_template
+		render(template, :name => '1', :errors => Errors.new(:name))
+		
+		assert_tag({
+			:tag => 'div',
+			:attributes => {:class => 'value_field field_with_errors field'}
+		})
+	end
+	
+	def test_multi_field_with_errors
+		template = <<-end_template
+			<% labelled_fields_for :var, @var do |f| %>
+			<% f.field :name do |field| %>
+			Field
+			<% end %>
+			<% end %>
+		end_template
+		render(template, :name => '1', :errors => Errors.new(:name))
+		
+		assert_tag({
+			:tag => 'div',
+			:attributes => {:class => 'multi_field field_with_errors field'}
+		})
+	end
+
+	class Errors
+	
+		def initialize (*vars)
+			@vars = vars.collect(&:to_sym)
+		end
+		
+		def on (var)
+			@vars.include?(var.to_sym)
+		end
+		
+	end	
+	
 end

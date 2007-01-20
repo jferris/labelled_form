@@ -77,6 +77,7 @@ module ActionView #:nodoc:
 				
 				options.stringify_keys!
 				options['class'] = options['class'] ? "#{options['class']} field" : 'field'
+				
 				label = label_tag(element_id, caption, options.delete('label_options') || {})
 				params = options.delete('params') || []
 				before_input, after_input = options.delete("wrap") || ["", ""]
@@ -159,11 +160,11 @@ module ActionView #:nodoc:
 			# 
 			# See <tt>LabelledFormHelper#labelled_field</tt>.
 			def labelled_field_for (method, content = nil, options = {}, &proc)
-				# TODO: error checking
 				options = options.stringify_keys
 				options['id'] ||= "#{@object_name}_#{method}_field"
 				caption = options.delete('label') || method.to_s.humanize + ":"
 				options['class'] = options['class'] ? "#{options['class']} value_field" : 'value_field'
+				options['class'] << ' field_with_errors' if @object.respond_to?(:errors) && @object.errors.on(method)
 				@template.send(:labelled_field, caption, content, "#{@object_name}_#{method}", options, &proc)
 			end
 			
@@ -177,16 +178,15 @@ module ActionView #:nodoc:
 			# 
 			# Like <tt>fields_for</tt>, <tt>labelled_field</tt> must be called in a
 			# ERb evaluation block, not a ERb output block. So that's <% %>, not <%= %>.
-			def labelled_field (methods, label = nil, content = nil, options = {}, &proc)
-				# TODO: error checking
-				
-				methods ||= []
+			def labelled_field (methods = [], label = nil, content = nil, options = {}, &proc)
+				methods = [methods] if methods.respond_to?(:to_sym)
 				label ||= methods.first.to_s.humanize + ":"
 				
 				options = options.stringify_keys
 				options['params'] = FormBuilder.new(@object_name, @object, @template, {}, proc)
 				options['wrap'] = [%{<span class="multi_input">}, "</span>"]
 				options['class'] = options['class'] ? "#{options['class']} multi_field" : 'multi_field'
+				options['class'] << ' field_with_errors' if @object.respond_to?(:errors) && methods.find {|method| @object.errors.on(method) }
 				@template.send(:labelled_field, label, content, nil, options, &proc)
 			end
 			
