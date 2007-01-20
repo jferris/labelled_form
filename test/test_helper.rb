@@ -5,6 +5,9 @@ require_gem 'actionpack'
 require 'action_controller'
 require 'action_controller/test_process'
 require 'action_view'
+require_gem 'activerecord'
+require 'active_record'
+require 'active_record/fixtures'
 
 $:.unshift(File.dirname(__FILE__))
 $:.unshift(File.join(File.dirname(__FILE__), '../lib'))
@@ -33,6 +36,10 @@ end
 
 class Test::Unit::TestCase
 
+	self.use_transactional_fixtures = true
+	self.use_instantiated_fixtures  = false
+	self.fixture_path = File.dirname(__FILE__) + '/fixtures'
+	
 	def render (template, var = nil)
 		@controller	= TestController.new
 		@request	= ActionController::TestRequest.new
@@ -48,3 +55,23 @@ class Test::Unit::TestCase
 	end
 
 end
+
+require 'schema'
+require 'models'
+
+ActiveRecord::Base.establish_connection(
+	:adapter	=> 'mysql',
+	:socket		=> '/var/run/mysqld/mysqld.sock',
+	:database	=> 'rubytest',
+	:username	=> 'root',
+	:password	=> ''
+)
+
+require 'labelled_form'
+
+DatabaseSchema.verbose = false
+begin
+	DatabaseSchema.migrate(:down)
+rescue
+end
+DatabaseSchema.migrate(:up)
