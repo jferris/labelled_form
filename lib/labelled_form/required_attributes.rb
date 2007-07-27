@@ -49,7 +49,7 @@ module ActiveRecord #:nodoc:
 			end
 			
 			def attribute_required_on? (attr_name, on) #:nodoc:
-				required_attributes_by_on[on] && required_attributes_by_on[on].include?(attr_name)
+				required_attributes_by_on && required_attributes_by_on[on] && required_attributes_by_on[on].include?(attr_name)
 			end
 	
 			# Returns an array of attributes that are required for this object.
