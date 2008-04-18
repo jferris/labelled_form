@@ -59,11 +59,8 @@ require 'schema'
 require 'models'
 
 ActiveRecord::Base.establish_connection(
-	:adapter	=> 'mysql',
-	:socket		=> '/var/run/mysqld/mysqld.sock',
-	:database	=> 'rubytest',
-	:username	=> 'root',
-	:password	=> ''
+	:adapter	=> 'sqlite3',
+	:database	=> 'test/test.db'
 )
 
 DatabaseSchema.verbose = false
