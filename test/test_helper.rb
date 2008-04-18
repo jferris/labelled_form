@@ -1,18 +1,16 @@
 require 'test/unit'
 require 'ostruct'
 require 'rubygems'
-require_gem 'actionpack'
 require 'action_controller'
 require 'action_controller/test_process'
 require 'action_view'
-require_gem 'activerecord'
 require 'active_record'
 require 'active_record/fixtures'
 
 $:.unshift(File.dirname(__FILE__))
 $:.unshift(File.join(File.dirname(__FILE__), '../lib'))
 
-ActionController::Base.template_root = File.join(File.dirname(__FILE__), 'views')
+ActionController::Base.view_paths = [File.join(File.dirname(__FILE__), 'views')]
 
 require File.join(File.dirname(__FILE__), '../init')
 
@@ -74,3 +72,4 @@ begin
 rescue
 end
 DatabaseSchema.migrate(:up)
+
