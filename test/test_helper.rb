@@ -1,6 +1,7 @@
 require 'test/unit'
 require 'ostruct'
 require 'rubygems'
+require 'spec'
 require 'action_controller'
 require 'action_controller/test_process'
 require 'action_view'

@@ -1,98 +1,135 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class LabelledFormBuilderTest < Test::Unit::TestCase
+describe "labelled form helpers" do
 	
-	def test_labelled_form_for
-		template = <<-end_template
-			<% labelled_form_for :var, :nodivs => true do |f| %>
-			<%= f.text_field :name %>
-			<% end %>
-		end_template
-		render(template, :name => 'test')
-		assert_tag({
-			:tag => 'form',
-			:child => {
-				:tag => 'div',
-				:attributes => {:class => 'value_field field'},
-				:child => {
-					:tag => 'label',
-					:attributes => {:for => 'var_name'},
-					:content => 'Name:'
-				}
-			}
-		})
+  describe "creating a labelled form for a record" do
+
+    before do
+      template = <<-end_template
+        <% labelled_form_for :var, :nodivs => true do |f| %>
+        <%= f.text_field :name %>
+        <% end %>
+      end_template
+      render(template, :name => 'test')
+    end
+
+    it "should generate a form tag" do
+      assert_tag({
+        :tag => 'form',
+        :child => {
+          :tag => 'div',
+          :attributes => {:class => 'value_field field'},
+          :child => {
+            :tag => 'label',
+            :attributes => {:for => 'var_name'},
+            :content => 'Name:'
+          }
+        }
+      })
+    end
+
+  end
+
+  describe "creating labelled fields for a record" do
+
+    before do
+      template = <<-end_template
+        <% labelled_fields_for :var do |f| %>
+        <%= f.text_field :name %>
+        <% end %>
+      end_template
+      render(template, :name => 'test')
+    end
+
+    it "should generate a field wrapper" do
+      assert_tag({
+        :tag => 'div',
+        :attributes => {:class => 'value_field field'},
+        :child => {
+          :tag => 'label',
+          :attributes => {:for => 'var_name'},
+          :content => 'Name:'
+        }
+      })
+    end
+
+  end
+
+  describe "creating a labelled field" do
+
+    before do
+      template = <<-end_template
+        <%= labelled_field 'Test:', '<span>content</span>' %>
+      end_template
+      render(template)
+    end
+
+    it "should generate a div for the field" do
+      assert_tag({
+        :tag => 'div',
+        :attributes => {:class => 'field'},
+        :child => {
+          :tag => 'label',
+          :attributes => {:for => nil},
+          :content => 'Test:'
+        }
+      })
+    end
+
+    it "should generate a span around the input" do
+      assert_tag(:tag => 'span', :content => 'content')
+    end
+
 	end
 	
-	def test_labelled_fields_for
-		template = <<-end_template
-			<% labelled_fields_for :var do |f| %>
-			<%= f.text_field :name %>
-			<% end %>
-		end_template
-		render(template, :name => 'test')
-		assert_tag({
-			:tag => 'div',
-			:attributes => {:class => 'value_field field'},
-			:child => {
-				:tag => 'label',
-				:attributes => {:for => 'var_name'},
-				:content => 'Name:'
-			}
-		})
-	end
-	
-	def test_labelled_field
-		template = <<-end_template
-			<%= labelled_field 'Test:', '<span>content</span>' %>
-		end_template
-		render(template)
-		assert_tag({
-			:tag => 'div',
-			:attributes => {:class => 'field'},
-			:child => {
-				:tag => 'label',
-				:attributes => {:for => nil},
-				:content => 'Test:'
-			}
-		})
-		assert_tag(:tag => 'span', :content => 'content')
-	end
-	
-	def test_labelled_field_multi
-		template = <<-end_template
-			<% labelled_form_for :var do |f| %>
-			<% f.field [:name], 'Test:' do |field| %>
-			<%= field.text_field :name %>
-			<% end %>
-			<% end %>
-		end_template
-		render(template, :name => 'test')
+  describe "generating a field with multiple inputs" do
+
+    before do
+      template = <<-end_template
+        <% labelled_form_for :var do |f| %>
+        <% f.field [:name], 'Test:' do |field| %>
+        <%= field.text_field :name %>
+        <% end %>
+        <% end %>
+      end_template
+      render(template, :name => 'test')
+    end
 		
-		assert_tag({
-			:tag => 'div',
-			:attributes => {:class => 'multi_field field'},
-			:child => {
-				:tag => 'label',
-				:attributes => {:for => nil},
-				:content => 'Test:'
-			}
-		})
-		assert_tag({
-			:tag => 'div',
-			:child => {
-				:tag => 'span',
-				:attributes => {:class => 'multi_input'},
-			}
-		})
-		assert_tag({
-			:tag => 'div',
-			:child => {
-				:tag => 'span',
-				:child => {:tag => 'input'}
-			}
-		})
+    it "should generate a div with a multi_field class" do
+      assert_tag({
+        :tag => 'div',
+        :attributes => {:class => 'multi_field field'},
+        :child => {
+          :tag => 'label',
+          :attributes => {:for => nil},
+          :content => 'Test:'
+        }
+      })
+    end
+
+    it "should generate a span with a multi_input class" do
+      assert_tag({
+        :tag => 'div',
+        :child => {
+          :tag => 'span',
+          :attributes => {:class => 'multi_input'},
+        }
+      })
+    end
+
+    it "should generate the text input tag" do
+      assert_tag({
+        :tag => 'div',
+        :child => {
+          :tag => 'span',
+          :child => {:tag => 'input'}
+        }
+      })
+    end
+
 	end
 	
+  # this crap should be rewritten
 	# tests wrapping for all built-in Rails helpers
 	def test_builder_methods
 		# helpers to test
@@ -167,177 +204,240 @@ class LabelledFormBuilderTest < Test::Unit::TestCase
 		
 	end
 	
-	def test_text_field_has_text_class
-		template = <<-end_template
-			<% labelled_form_for :var do |f| %>
-			<%= f.text_field :name %>
-			<% end %>
-		end_template
-		render(template, :name => 'test')
-		
-		assert_tag({
-			:tag => 'input',
-			:attributes => {:class => 'text'}
-		})
+  describe "a text input field" do
+
+    before do
+      template = <<-end_template
+        <% labelled_form_for :var do |f| %>
+        <%= f.text_field :name %>
+        <% end %>
+      end_template
+      render(template, :name => 'test')
+    end
+
+    it "should have the text class" do
+      assert_tag({
+        :tag => 'input',
+        :attributes => {:class => 'text'}
+      })
+    end
+
 	end
 	
-	def test_submit
-		template = <<-end_template
-			<% labelled_form_for :var do |f| %>
-			<%= f.submit('Submit') %>
-			<% end %>
-		end_template
-		render(template, :name => 'test')
+  describe "generating a submit" do
+
+    before do
+      template = <<-end_template
+        <% labelled_form_for :var do |f| %>
+        <%= f.submit('Submit') %>
+        <% end %>
+      end_template
+      render(template, :name => 'test')
+    end
 		
-		assert_tag({
-			:tag => 'div',
-			:attributes => {:class => 'submit'},
-			:child => {
-				:tag => 'input',
-				:attributes => {
-					:type => 'submit',
-					:value => 'Submit'
-				},
-			}
-		})
+    it "should create a div tag around a submit input tag" do
+      assert_tag({
+        :tag => 'div',
+        :attributes => {:class => 'submit'},
+        :child => {
+          :tag => 'input',
+          :attributes => {
+            :type => 'submit',
+            :value => 'Submit'
+          },
+        }
+      })
+    end
 	end
 	
-	def test_labelled_check_box
-		render(%{<%= labelled_check_box(:var, :name) %>}, :name => '1')
+  describe "generating a labelled check box" do
+
+    before do
+      render(%{<%= labelled_check_box(:var, :name) %>}, :name => '1')
+    end
 		
-		assert_tag({
-			:tag => 'div',
-			:attributes => {:class => 'boolean_field'},
-			:child => {
-				:tag => 'input',
-				:attributes => {
-					:checked => 'checked',
-					:id => 'var_name',
-					:value => '1'
-				}
-			}
-		})
-		assert_tag({
-			:tag => 'div',
-			:child => {
-				:tag => 'label',
-				:attributes => {:for => 'var_name'},
-				:content => 'Name?'
-			}
-		})
+    it "should surround the check box with a boolean_field div" do
+      assert_tag({
+        :tag => 'div',
+        :attributes => {:class => 'boolean_field'},
+        :child => {
+          :tag => 'input',
+          :attributes => {
+            :checked => 'checked',
+            :id => 'var_name',
+            :value => '1'
+          }
+        }
+      })
+    end
+
+    it "should create a label for the check box" do
+      assert_tag({
+        :tag => 'div',
+        :child => {
+          :tag => 'label',
+          :attributes => {:for => 'var_name'},
+          :content => 'Name?'
+        }
+      })
+    end
+
 	end
 	
-	def test_builder_labelled_check_box
-		template = <<-end_template
-			<% fields_for :var do |f| %>
-			<%= f.labelled_check_box :name %>
-			<% end %>
-		end_template
-		render(template, :name => '1')
+  describe "generating a labelled check box" do
+
+    before do
+      template = <<-end_template
+        <% fields_for :var do |f| %>
+        <%= f.labelled_check_box :name %>
+        <% end %>
+      end_template
+      render(template, :name => '1')
+    end
 		
-		assert_tag({
-			:tag => 'div',
-			:attributes => {:class => 'boolean_field'}
-		})
+    it "should use the boolean_field class" do
+      assert_tag({
+        :tag => 'div',
+        :attributes => {:class => 'boolean_field'}
+      })
+    end
+
 	end
 	
-	def test_labelled_check_box_tag
-		render(%{<%= labelled_check_box_tag('var_name', '1', true) %>})
+  describe "generating a labelled check box tag" do
+
+    before do
+      render(%{<%= labelled_check_box_tag('var_name', '1', true) %>})
+    end
 		
-		assert_tag({
-			:tag => 'div',
-			:attributes => {:class => 'boolean_field'},
-			:child => {
-				:tag => 'input',
-				:attributes => {
-					:checked => 'checked',
-					:id => 'var_name',
-					:value => '1'
-				}
-			}
-		})
-		assert_tag({
-			:tag => 'div',
-			:child => {
-				:tag => 'label',
-				:attributes => {:for => 'var_name'},
-				:content => 'Var name:'
-			}
-		})
+    it "should generate the input tag" do
+      assert_tag({
+        :tag => 'div',
+        :attributes => {:class => 'boolean_field'},
+        :child => {
+          :tag => 'input',
+          :attributes => {
+            :checked => 'checked',
+            :id => 'var_name',
+            :value => '1'
+          }
+        }
+      })
+    end
+
+    it "should generate the label tag" do
+      assert_tag({
+        :tag => 'div',
+        :child => {
+          :tag => 'label',
+          :attributes => {:for => 'var_name'},
+          :content => 'Var name:'
+        }
+      })
+    end
+
 	end
 	
-	def test_labelled_builder_check_box
-		template = <<-end_template
-			<% labelled_form_for :var do |f| %>
-			<%= f.check_box :name %>
-			<% end %>
-		end_template
-		render(template, :name => '1')
+  describe "generating a labelled check box using a form builder" do
+
+    before do
+      template = <<-end_template
+        <% labelled_form_for :var do |f| %>
+        <%= f.check_box :name %>
+        <% end %>
+      end_template
+      render(template, :name => '1')
+    end
 		
-		assert_tag({
-			:tag => 'div',
-			:attributes => {:class => 'boolean_field'}
-		})
+    it "should use the boolean_field class" do
+      assert_tag({
+        :tag => 'div',
+        :attributes => {:class => 'boolean_field'}
+      })
+    end
+
 	end
 	
-	def test_value_field_with_errors
-		template = <<-end_template
-			<% labelled_fields_for :var, @var do |f| %>
-			<%= f.text_field :name %>
-			<% end %>
-		end_template
-		render(template, :name => '1', :errors => Errors.new(:name))
+  describe "a value field with errors" do
+
+    before do
+      template = <<-end_template
+        <% labelled_fields_for :var, @var do |f| %>
+        <%= f.text_field :name %>
+        <% end %>
+      end_template
+      render(template, :name => '1', :errors => Errors.new(:name))
+    end
 		
-		assert_tag({
-			:tag => 'div',
-			:attributes => {:class => 'value_field field_with_errors field'}
-		})
+    it "should have an error class" do
+      assert_tag({
+        :tag => 'div',
+        :attributes => {:class => 'value_field field_with_errors field'}
+      })
+    end
 	end
 	
-	def test_multi_field_with_errors
-		template = <<-end_template
-			<% labelled_fields_for :var, @var do |f| %>
-			<% f.field :name do |field| %>
-			Field
-			<% end %>
-			<% end %>
-		end_template
-		render(template, :name => '1', :errors => Errors.new(:name))
+  describe "a multiple field with errors" do
+
+    before do
+      template = <<-end_template
+        <% labelled_fields_for :var, @var do |f| %>
+        <% f.field :name do |field| %>
+        Field
+        <% end %>
+        <% end %>
+      end_template
+      render(template, :name => '1', :errors => Errors.new(:name))
+    end
 		
-		assert_tag({
-			:tag => 'div',
-			:attributes => {:class => 'multi_field field_with_errors field'}
-		})
+    it "should have an error class" do
+      assert_tag({
+        :tag => 'div',
+        :attributes => {:class => 'multi_field field_with_errors field'}
+      })
+    end
+
 	end
 	
-	def test_required_attributes
-		template = <<-end_template
-			<% labelled_fields_for :var, @var do |f| %>
-			<%= f.text_field :name %>
-			<% end %>
-		end_template
-		render(template, Person.new)
+  describe "a required field" do
+
+    before do
+      template = <<-end_template
+        <% labelled_fields_for :var, @var do |f| %>
+        <%= f.text_field :name %>
+        <% end %>
+      end_template
+      render(template, Person.new)
+    end
 		
-		assert_tag({
-			:tag => 'div',
-			:attributes => {:class => 'value_field required_field field'}
-		})
+    it "should have a required class" do
+      assert_tag({ :tag => 'div',
+        :attributes => {:class => 'value_field required_field field'}
+      })
+    end
+
 	end
 
-	def test_required_attributes_with_multi_field
-		template = <<-end_template
-			<% labelled_fields_for :var, @var do |f| %>
-			<% f.field :name do %>
-			Field
-			<% end %>
-			<% end %>
-		end_template
-		render(template, Person.new)
+  describe "a multi field with a required input" do
+
+    before do
+      template = <<-end_template
+        <% labelled_fields_for :var, @var do |f| %>
+        <% f.field :name do %>
+        Field
+        <% end %>
+        <% end %>
+      end_template
+      render(template, Person.new)
+    end
 		
-		assert_tag({
-			:tag => 'div',
-			:attributes => {:class => 'multi_field required_field field'}
-		})
+    it "should have a required class" do
+      assert_tag({
+        :tag => 'div',
+        :attributes => {:class => 'multi_field required_field field'}
+      })
+    end
+
 	end
 
 	class Errors
