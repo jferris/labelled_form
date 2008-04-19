@@ -8,7 +8,7 @@ task :default => :test
 desc 'Test the quick_forms plugin.'
 Rake::TestTask.new(:test) do |t|
   t.libs << 'lib'
-  t.pattern = 'test/**/*_test.rb'
+  t.pattern = 'test/**/test_*.rb'
   t.verbose = true
 end
 
