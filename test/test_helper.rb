@@ -2,6 +2,7 @@ require 'test/unit'
 require 'ostruct'
 require 'rubygems'
 require 'spec'
+require 'hpricot'
 require 'action_controller'
 require 'action_controller/test_process'
 require 'action_view'
@@ -53,6 +54,56 @@ class Test::Unit::TestCase
 		@response.body
 	end
 
+end
+
+module TagMatchers
+
+  class TagMatcher
+
+    def initialize (expected, text = nil)
+      @expected = expected
+      @text     = text
+    end
+
+    def matches? (target)
+      @target = target
+      doc = Hpricot(target)
+      @elem = doc.at(@expected)
+      @elem && (@text.nil? || @elem.inner_html == @text)
+    end
+
+    def failure_message
+      "Expected #{match_message}"
+    end
+
+    def negative_failure_message
+      "Did not expect #{match_message}"
+    end
+
+    protected
+
+    def match_message
+      if @elem
+        "#{@elem.to_s.inspect} to have text #{@text.inspect}"
+      else
+        "#{@target.inspect} to contain element #{@expected.inspect}"
+      end
+    end
+
+  end
+
+  def have_tag (expression)
+    TagMatcher.new(expression)
+  end
+
+  def have_text (expression, text)
+    TagMatcher.new(expression, text)
+  end
+
+end
+
+Spec::Runner.configure do |config|
+  config.include TagMatchers
 end
 
 require 'labelled_form'
