@@ -11,9 +11,9 @@ describe "label helpers" do
       end
 
       it "should generate a label tag using the humanized symbol as the label" do
-        response.should have_tag('label')
-        response.should have_tag('label[for = ?]')
-        response.should have_tag('label', 'Address:')
+        assert_tag(:tag => 'label',
+                   :attributes => {:for => 'address'},
+                   :content => 'Address:')
       end
 
     end
