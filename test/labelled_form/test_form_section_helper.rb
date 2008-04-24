@@ -29,15 +29,15 @@ describe "form section helpers" do
     end
 		
     it "should create a title section" do
-      @result.should have_text('//h2', 'Section Title')
+      @result.should have_tag('//h2').with_text('Section Title')
     end
 
     it "should create an info section" do
-      @result.should have_text('.section_info p', 'I am the info')
+      @result.should have_tag('.section_info p').with_text('I am the info')
     end
 
     it "should create a body section"do
-      @result.should have_text('.section_body p', 'I am the body')
+      @result.should have_tag('.section_body p').with_text('I am the body')
     end
 
 	end

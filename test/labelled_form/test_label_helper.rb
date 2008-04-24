@@ -12,7 +12,7 @@ describe "label helpers" do
 
       it "should generate a label tag using the humanized symbol as the label" do
         @result.should have_tag('//label[@for = "address"]')
-        @result.should have_text('//label', 'Address:')
+        @result.should have_tag('//label').with_text('Address:')
       end
 
     end
@@ -25,7 +25,7 @@ describe "label helpers" do
 
       it "should generate a label tag using the string as a label" do
         @result.should have_tag('//label[@for = "address"]')
-        @result.should have_text('//label', 'Mailing Address:')
+        @result.should have_tag('//label').with_text('Mailing Address:')
       end
 		
     end
@@ -38,7 +38,7 @@ describe "label helpers" do
 
       it "should generate a label tag using the string as a label" do
         @result.should_not have_tag('//label[@for]')
-        @result.should have_text('//label', 'Mailing Address:')
+        @result.should have_tag('//label').with_text('Mailing Address:')
       end
 		
     end
@@ -52,7 +52,7 @@ describe "label helpers" do
       it "should generate a label tag and append options for the tag" do
         @result.should have_tag('//label[@for = "address"]')
         @result.should have_tag('//label[@class = "test"]')
-        @result.should have_text('//label', 'Mailing Address:')
+        @result.should have_tag('//label').with_text('Mailing Address:')
       end
 
     end
@@ -67,7 +67,7 @@ describe "label helpers" do
 
     it "should use the humanized attribute name as the label" do
       @result.should have_tag('//label[@for = "var_name"]')
-      @result.should have_text('//label', 'Name:')
+      @result.should have_tag('//label').with_text('Name:')
     end
 
   end
@@ -85,7 +85,7 @@ describe "label helpers" do
 
     it "should generate a label tag using the form builder's object" do
       @result.should have_tag('//label[@for = "var_name"]')
-      @result.should have_text('//label', 'Name:')
+      @result.should have_tag('//label').with_text('Name:')
     end
 
 	end

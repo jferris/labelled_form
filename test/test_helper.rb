@@ -60,9 +60,14 @@ module TagMatchers
 
   class TagMatcher
 
-    def initialize (expected, text = nil)
+    def initialize (expected)
       @expected = expected
-      @text     = text
+      @text     = nil
+    end
+
+    def with_text (text)
+      @text = text
+      self
     end
 
     def matches? (target)
@@ -94,10 +99,6 @@ module TagMatchers
 
   def have_tag (expression)
     TagMatcher.new(expression)
-  end
-
-  def have_text (expression, text)
-    TagMatcher.new(expression, text)
   end
 
 end
