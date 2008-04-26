@@ -24,23 +24,14 @@ module ActionView #:nodoc:
 				raise ArgumentError, "Missing block" unless block_given?
 				
 				options = args.last.is_a?(Hash) ? args.pop : {}
-				title = options.delete(:title) || "#{controller.action_name} #{object_name}".titleize
 				nodivs = options.delete(:nodivs)
 				
 				html_options = (options.delete(:html) || {}).stringify_keys
 				html_options['class'] = html_options['class'] ? "#{html_options['class']} labelled" : 'labelled'
 				
 				concat(form_tag(options.delete(:url) || {}, html_options) + "\n", proc.binding)
-				concat(content_tag("h1", title) + "\n", proc.binding) unless options.delete(:no_title)
-				concat(tag("div", {"class" => "body"}, true), proc.binding) unless nodivs
 				object = instance_variable_get("@#{object_name}")
-				concat(error_messages_for(object_name), proc.binding) if object.respond_to?(:errors)
-				concat(tag("div", {"class" => "fields"}, true), proc.binding) unless nodivs
 				fields_for(object_name, *(args << {:builder => LabelledFormBuilder}), &proc)
-				unless nodivs
-					concat("</div> <!-- /fields -->\n", proc.binding)
-					concat("</div> <!-- /body -->\n", proc.binding)
-				end
 				concat('</form>', proc.binding)
 			end
 			
