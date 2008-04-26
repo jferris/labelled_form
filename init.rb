@@ -4,6 +4,3 @@ ActionView::Base.class_eval do
 	include ActionView::Helpers::LabelledFormHelper
 	include ActionView::Helpers::FormSectionHelper
 end
-ActiveRecord::Base.class_eval do
-	include ActiveRecord::RequiredAttributes
-end

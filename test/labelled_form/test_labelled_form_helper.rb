@@ -399,47 +399,6 @@ describe "labelled form helpers" do
 
 	end
 	
-  describe "a required field" do
-
-    before do
-      template = <<-end_template
-        <% labelled_fields_for :var, @var do |f| %>
-        <%= f.text_field :name %>
-        <% end %>
-      end_template
-      render(template, Person.new)
-    end
-		
-    it "should have a required class" do
-      assert_tag({ :tag => 'div',
-        :attributes => {:class => 'value_field required_field field'}
-      })
-    end
-
-	end
-
-  describe "a multi field with a required input" do
-
-    before do
-      template = <<-end_template
-        <% labelled_fields_for :var, @var do |f| %>
-        <% f.field :name do %>
-        Field
-        <% end %>
-        <% end %>
-      end_template
-      render(template, Person.new)
-    end
-		
-    it "should have a required class" do
-      assert_tag({
-        :tag => 'div',
-        :attributes => {:class => 'multi_field required_field field'}
-      })
-    end
-
-	end
-
 	class Errors
 	
 		def initialize (*vars)
