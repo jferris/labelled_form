@@ -87,7 +87,7 @@ describe "labelled form helpers" do
     before do
       template = <<-end_template
         <% labelled_form_for :var do |f| %>
-        <% f.field [:name], 'Test:' do |field| %>
+        <% f.field_for :name, :label => 'Test:' do |field| %>
         <%= field.text_field :name %>
         <% end %>
         <% end %>
@@ -95,24 +95,24 @@ describe "labelled form helpers" do
       render(template, :name => 'test')
     end
 		
-    it "should generate a div with a multi_field class" do
+    it "should generate a div with a field class" do
       assert_tag({
         :tag => 'div',
-        :attributes => {:class => 'multi_field field'},
+        :attributes => {:class => 'field'},
         :child => {
           :tag => 'label',
-          :attributes => {:for => nil},
+          :attributes => {:for => 'var_name'},
           :content => 'Test:'
         }
       })
     end
 
-    it "should generate a span with a multi_input class" do
+    it "should generate a span with an input class" do
       assert_tag({
         :tag => 'div',
         :child => {
           :tag => 'span',
-          :attributes => {:class => 'multi_input'},
+          :attributes => {:class => 'input'},
         }
       })
     end
@@ -165,10 +165,10 @@ describe "labelled form helpers" do
 				assertions << lambda do
 					begin
 						field_class = %w(date_select datetime_select).include?(helper) ?
-						'multi_field' : 'value_field'
+						'field' : 'value_field field'
 						assert_tag({
 							:tag => 'div',
-							:attributes => {:class => "#{field_class} field"},
+							:attributes => {:class => field_class},
 							:descendant => {:tag => tag}
 						})
 					rescue Test::Unit::AssertionFailedError => e
@@ -336,7 +336,7 @@ describe "labelled form helpers" do
     before do
       template = <<-end_template
         <% labelled_fields_for :var, @var do |f| %>
-        <% f.field :name do |field| %>
+        <% f.field_for :name do |field| %>
         Field
         <% end %>
         <% end %>
@@ -347,7 +347,7 @@ describe "labelled form helpers" do
     it "should have an error class" do
       assert_tag({
         :tag => 'div',
-        :attributes => {:class => 'multi_field field_with_errors field'}
+        :attributes => {:class => 'field_with_errors field'}
       })
     end
 

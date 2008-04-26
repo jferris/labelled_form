@@ -13,18 +13,6 @@ module ActionView #:nodoc:
 		# <tt>FormBuilder#labelled_check_box</tt>.
 		class LabelledFormBuilder < FormBuilder
 			
-			# Creates a labelled field for the propery referenced by <tt>method</tt>.
-			# 
-			# See <tt>LabelledFormHelper#labelled_field_tag</tt>.
-			def field_for (method, content = nil, options = {}, &proc)
-				options = options.stringify_keys
-				options['id'] ||= "#{@object_name}_#{method}_field"
-				caption = options.delete('label') || method.to_s.humanize + ":"
-				options['class'] = options['class'] ? "#{options['class']} value_field" : 'value_field'
-				options['class'] << ' field_with_errors' if @object.respond_to?(:errors) && @object.errors.on(method)
-				@template.send(:labelled_field_tag, caption, content, "#{@object_name}_#{method}", options, &proc)
-			end
-			
 			# Wraps a call to <tt>fields_for</tt> in a div tag, passing the standard
 			# (non-labelling) <tt>FormBuilder</tt> to a block. This allows for labelled
 			# fields with more than one input tag.
@@ -35,16 +23,19 @@ module ActionView #:nodoc:
 			# 
 			# Like <tt>fields_for</tt>, <tt>labelled_field</tt> must be called in a
 			# ERb evaluation block, not a ERb output block. So that's <% %>, not <%= %>.
-			def field (methods = [], label = nil, content = nil, options = {}, &proc)
-				methods = [methods] if methods.respond_to?(:to_sym)
-				label ||= methods.first.to_s.humanize + ":"
-				
-				options = options.stringify_keys
+      def field_for (*methods, &proc)
+        options = methods.last.is_a?(Hash) ? methods.pop.stringify_keys : {}
+        if methods.size == 1
+          options['input_id'] ||= "#{@object_name}_#{methods.first}"
+          options['id'] ||= "#{options['input_id']}_field"
+        end
+				options['label'] ||= methods.first.to_s.humanize + ":"
 				options['params'] = FormBuilder.new(@object_name, @object, @template, {}, proc)
-				options['wrap'] = [%{<span class="multi_input">}, "</span>"]
-				options['class'] = options['class'] ? "#{options['class']} multi_field" : 'multi_field'
-				options['class'] << ' field_with_errors' if @object.respond_to?(:errors) && methods.find {|method| @object.errors.on(method) }
-				@template.send(:labelled_field_tag, label, content, nil, options, &proc)
+				options['wrap'] ||= [%{<span class="input">}, "</span>"]
+        if @object.respond_to?(:errors) && methods.find {|method| @object.errors.on(method) }
+          options['class'] = options['class'] ? "#{options['class']} field_with_errors" : 'field_with_errors'
+        end
+				@template.send(:labelled_field_tag, options.delete('label'), options.delete('content'), options.delete('input_id'), options, &proc)
 			end
 			
 			# Creates a labelled check box.
@@ -90,9 +81,10 @@ module ActionView #:nodoc:
 				field_options ||= {}
 				field_options.stringify_keys!
 				field_options['label'] ||= caption
-				is_multi ?
-				field([method], caption, content, field_options) :
-				field_for(method, content, field_options)
+        unless is_multi
+          field_options['class'] = field_options['class'] ? "#{field_options['class']} value_field" : 'value_field'
+        end
+				field_for(method, field_options.merge(:content => content, :wrap => ['', '']))
 			end
 			
 			def without_error_wrapping
