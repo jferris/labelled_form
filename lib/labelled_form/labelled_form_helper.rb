@@ -156,7 +156,6 @@ module ActionView #:nodoc:
 				caption = options.delete('label') || method.to_s.humanize + ":"
 				options['class'] = options['class'] ? "#{options['class']} value_field" : 'value_field'
 				options['class'] << ' field_with_errors' if @object.respond_to?(:errors) && @object.errors.on(method)
-				options['class'] << ' required_field' if @object.respond_to?(:attribute_required?) && @object.attribute_required?(method)
 				@template.send(:labelled_field, caption, content, "#{@object_name}_#{method}", options, &proc)
 			end
 			
@@ -179,7 +178,6 @@ module ActionView #:nodoc:
 				options['wrap'] = [%{<span class="multi_input">}, "</span>"]
 				options['class'] = options['class'] ? "#{options['class']} multi_field" : 'multi_field'
 				options['class'] << ' field_with_errors' if @object.respond_to?(:errors) && methods.find {|method| @object.errors.on(method) }
-				options['class'] << ' required_field' if @object.respond_to?(:attribute_required?) && methods.find {|method| @object.attribute_required?(method) }
 				@template.send(:labelled_field, label, content, nil, options, &proc)
 			end
 			
@@ -188,14 +186,6 @@ module ActionView #:nodoc:
 			# See <tt>LabelledFormHelper#labelled_check_box</tt>.
 			def labelled_check_box (method, options = {}, checked_value = "1", unchecked_value = "0")
 				@template.send(:labelled_check_box, @object_name, method, options.merge(:object => @object), checked_value, unchecked_value)
-			end
-			
-			# Creates a submit tag for this form and wraps it in a div tag
-			# so that you can style it properly in CSS
-			# <tt>caption</tt> is the caption for the tag. Defaults to 'Save'.
-			def submit(caption = 'Save', options = {})
-				input = @template.send(:submit_tag, caption, options)
-				%{<div class="submit">#{input}</div>}
 			end
 			
 		end

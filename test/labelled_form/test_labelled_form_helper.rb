@@ -224,32 +224,6 @@ describe "labelled form helpers" do
 
 	end
 	
-  describe "generating a submit" do
-
-    before do
-      template = <<-end_template
-        <% labelled_form_for :var do |f| %>
-        <%= f.submit('Submit') %>
-        <% end %>
-      end_template
-      render(template, :name => 'test')
-    end
-		
-    it "should create a div tag around a submit input tag" do
-      assert_tag({
-        :tag => 'div',
-        :attributes => {:class => 'submit'},
-        :child => {
-          :tag => 'input',
-          :attributes => {
-            :type => 'submit',
-            :value => 'Submit'
-          },
-        }
-      })
-    end
-	end
-	
   describe "generating a labelled check box" do
 
     before do
