@@ -5,8 +5,7 @@ module ActionView #:nodoc:
 		# call <tt>labelled_form_for</tt> instead.
 		# 
 		# Wraps each of the built-in Rails helper methods with a call to
-		# <tt>labelled_field_tag</tt>, which adds a label and wraps the field
-		# in a div tag.
+		# <tt>field</tt>, which adds a label and wraps the field in a div tag.
 		# 
 		# All <tt>labelled_*</tt> methods from <tt>FormBuilder</tt> are aliased
 		# without the <tt>labelled_</tt> prefix, so you can call, for example,
@@ -17,7 +16,7 @@ module ActionView #:nodoc:
 			# Creates a labelled field for the propery referenced by <tt>method</tt>.
 			# 
 			# See <tt>LabelledFormHelper#labelled_field_tag</tt>.
-			def labelled_field_for (method, content = nil, options = {}, &proc)
+			def field_for (method, content = nil, options = {}, &proc)
 				options = options.stringify_keys
 				options['id'] ||= "#{@object_name}_#{method}_field"
 				caption = options.delete('label') || method.to_s.humanize + ":"
@@ -36,7 +35,7 @@ module ActionView #:nodoc:
 			# 
 			# Like <tt>fields_for</tt>, <tt>labelled_field</tt> must be called in a
 			# ERb evaluation block, not a ERb output block. So that's <% %>, not <%= %>.
-			def labelled_field (methods = [], label = nil, content = nil, options = {}, &proc)
+			def field (methods = [], label = nil, content = nil, options = {}, &proc)
 				methods = [methods] if methods.respond_to?(:to_sym)
 				label ||= methods.first.to_s.humanize + ":"
 				
@@ -51,7 +50,7 @@ module ActionView #:nodoc:
 			# Creates a labelled check box.
 			# 
 			# See <tt>LabelledFormHelper#labelled_check_box</tt>.
-			def labelled_check_box (method, options = {}, checked_value = "1", unchecked_value = "0")
+			def check_box (method, options = {}, checked_value = "1", unchecked_value = "0")
 				@template.send(:labelled_check_box, @object_name, method, options.merge(:object => @object), checked_value, unchecked_value)
 			end
 
@@ -92,8 +91,8 @@ module ActionView #:nodoc:
 				field_options.stringify_keys!
 				field_options['label'] ||= caption
 				is_multi ?
-				labelled_field([method], caption, content, field_options) :
-				labelled_field_for(method, content, field_options)
+				field([method], caption, content, field_options) :
+				field_for(method, content, field_options)
 			end
 			
 			def without_error_wrapping
@@ -103,10 +102,6 @@ module ActionView #:nodoc:
 				InstanceTag.error_wrapping_enabled = old_error_wrapping_enabled
 				result
 			end
-			
-			alias_method :field_for, :labelled_field_for
-			alias_method :field, :labelled_field
-			alias_method :check_box, :labelled_check_box
 			
 		end
 
