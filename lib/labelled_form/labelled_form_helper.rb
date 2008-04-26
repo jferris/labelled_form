@@ -63,7 +63,7 @@ module ActionView #:nodoc:
 			# <tt>content</tt> will be set to the result of the block, and
 			# <tt>labelled_field</tt> must be called in a ERb evaluation block,
 			# not a ERb output block. So that's <% %>, not <%= %>.
-			def labelled_field (caption, content = nil, element_id = nil, options = {}, &proc)
+			def labelled_field_tag (caption, content = nil, element_id = nil, options = {}, &proc)
 				raise ArgumentError, "You mast pass either content or a block" if content.nil? and !block_given?
 				
 				options.stringify_keys!

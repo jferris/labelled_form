@@ -5,7 +5,7 @@ module ActionView #:nodoc:
 		# call <tt>labelled_form_for</tt> instead.
 		# 
 		# Wraps each of the built-in Rails helper methods with a call to
-		# <tt>labelled_field</tt>, which adds a label and wraps the field
+		# <tt>labelled_field_tag</tt>, which adds a label and wraps the field
 		# in a div tag.
 		# 
 		# All <tt>labelled_*</tt> methods from <tt>FormBuilder</tt> are aliased
@@ -16,14 +16,14 @@ module ActionView #:nodoc:
 			
 			# Creates a labelled field for the propery referenced by <tt>method</tt>.
 			# 
-			# See <tt>LabelledFormHelper#labelled_field</tt>.
+			# See <tt>LabelledFormHelper#labelled_field_tag</tt>.
 			def labelled_field_for (method, content = nil, options = {}, &proc)
 				options = options.stringify_keys
 				options['id'] ||= "#{@object_name}_#{method}_field"
 				caption = options.delete('label') || method.to_s.humanize + ":"
 				options['class'] = options['class'] ? "#{options['class']} value_field" : 'value_field'
 				options['class'] << ' field_with_errors' if @object.respond_to?(:errors) && @object.errors.on(method)
-				@template.send(:labelled_field, caption, content, "#{@object_name}_#{method}", options, &proc)
+				@template.send(:labelled_field_tag, caption, content, "#{@object_name}_#{method}", options, &proc)
 			end
 			
 			# Wraps a call to <tt>fields_for</tt> in a div tag, passing the standard
@@ -45,7 +45,7 @@ module ActionView #:nodoc:
 				options['wrap'] = [%{<span class="multi_input">}, "</span>"]
 				options['class'] = options['class'] ? "#{options['class']} multi_field" : 'multi_field'
 				options['class'] << ' field_with_errors' if @object.respond_to?(:errors) && methods.find {|method| @object.errors.on(method) }
-				@template.send(:labelled_field, label, content, nil, options, &proc)
+				@template.send(:labelled_field_tag, label, content, nil, options, &proc)
 			end
 			
 			# Creates a labelled check box.

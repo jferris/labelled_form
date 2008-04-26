@@ -59,7 +59,7 @@ describe "labelled form helpers" do
 
     before do
       template = <<-end_template
-        <%= labelled_field 'Test:', '<span>content</span>' %>
+        <%= labelled_field_tag 'Test:', '<span>content</span>' %>
       end_template
       render(template)
     end
