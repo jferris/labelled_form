@@ -35,7 +35,7 @@ module ActionView #:nodoc:
         if @object.respond_to?(:errors) && methods.find {|method| @object.errors.on(method) }
           options['class'] = options['class'] ? "#{options['class']} field_with_errors" : 'field_with_errors'
         end
-				@template.send(:labelled_field_tag, options.delete('label'), options.delete('content'), options.delete('input_id'), options, &proc)
+				@template.send(:labelled_field_tag, options, &proc)
 			end
 			
 			# Creates a labelled check box.
