@@ -258,26 +258,6 @@ describe "labelled form helpers" do
 
 	end
 	
-  describe "generating a labelled check box" do
-
-    before do
-      template = <<-end_template
-        <% fields_for :var do |f| %>
-        <%= f.labelled_check_box :name %>
-        <% end %>
-      end_template
-      render(template, :name => '1')
-    end
-		
-    it "should use the boolean_field class" do
-      assert_tag({
-        :tag => 'div',
-        :attributes => {:class => 'boolean_field'}
-      })
-    end
-
-	end
-	
   describe "generating a labelled check box tag" do
 
     before do
