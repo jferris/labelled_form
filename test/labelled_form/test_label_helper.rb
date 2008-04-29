@@ -4,23 +4,22 @@ describe "label helpers" do
 	
   context "label_tag" do
 
-    context "with only a symbol" do
+    context "with only a string" do
 
       before do
-        @result = render(%{<%= label_tag(:address) %>})
+        @result = render(%{<%= label_tag('Address:') %>})
       end
 
-      it "should generate a label tag using the humanized symbol as the label" do
-        @result.should have_tag('//label[@for = "address"]')
+      it "should generate a label tag using the string as the label" do
         @result.should have_tag('//label').with_text('Address:')
       end
 
     end
 		
-    context "with a symbol and a string" do
+    context "with for and caption in the options hash" do
 
       before do
-        @result = render(%{<%= label_tag(:address, "Mailing Address:") %>})
+        @result = render(%{<%= label_tag(:for => :address, :caption => "Mailing Address:") %>})
       end
 
       it "should generate a label tag using the string as a label" do
@@ -30,10 +29,10 @@ describe "label helpers" do
 		
     end
 
-    context "with nil and a string" do
+    context "with only a caption" do
 
       before do
-        @result = render(%{<%= label_tag(nil, "Mailing Address:") %>})
+        @result = render(%{<%= label_tag(:caption => "Mailing Address:") %>})
       end
 
       it "should generate a label tag using the string as a label" do
@@ -43,10 +42,10 @@ describe "label helpers" do
 		
     end
 
-    context "with a symbol, a string, and an options hash" do
+    context "with for, a caption, and extra options" do
 
       before do
-        @result = render(%{<%= label_tag(:address, "Mailing Address:", :class => 'test') %>})
+        @result = render(%{<%= label_tag(:for => :address, :caption => "Mailing Address:", :class => 'test') %>})
       end
       
       it "should generate a label tag and append options for the tag" do

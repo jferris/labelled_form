@@ -71,7 +71,7 @@ module ActionView #:nodoc:
 				
 				options['class'] = options['class'] ? "#{options['class']} field" : 'field'
 
-				label = label_tag(options.delete('input_id'), options.delete('label'), options.delete('label_options') || {})
+				label = label_tag(options.delete('label'))
 				params = options.delete('params') || []
 				before_input, after_input = options.delete("wrap") || ["", ""]
 				
@@ -92,11 +92,16 @@ module ActionView #:nodoc:
 			# 
 			# See <tt>labelled_check_box_tag</tt>.
 			def labelled_check_box (object_name, method, options = {}, checked_value = "1", unchecked_value = "0")
-				caption = options.delete(:label) || (method.to_s.humanize + "?")
-				label_options = options.delete(:label_options) || {}
-				input_options = options.delete(:input) || {}
+        options = options.stringify_keys
+        if options['label'].respond_to?(:to_str)
+          options['label'] = { 'caption' => options['label'] }
+        end
+        options['label'] ||= {}
+        options['label']['for'] = "#{object_name}_#{method}"
+        options['label']['caption'] ||= method.to_s.humanize + '?'
+				input_options = options.delete('input') || {}
 				InstanceTag.new(object_name, method, self, nil,
-								options.delete(:object)).to_labelled_check_box_tag(caption, label_options, input_options, options, checked_value, unchecked_value)
+								options.delete('object')).to_labelled_check_box_tag(options.delete('label'), input_options, options, checked_value, unchecked_value)
 			end
 			
 			# Creates a labelled check box (a boolean input field). Works like <tt>check_box</tt>,
@@ -108,12 +113,11 @@ module ActionView #:nodoc:
 			# label:: the caption for the label. If omitted, the label will be guessed from the method name.
 			def labelled_check_box_tag (name, value = "1", checked = false, options = {})
 				options = options.stringify_keys
-				caption = options.delete('label')
-				label_options = options.delete('label_options') || {}
 				input_options = options.delete('input') || {}
+        input_options['id'] ||= name
 				
 				check_box = check_box_tag(name, value, checked, input_options)
-				label = label_tag(input_options['id'] || name || nil, caption, label_options)
+				label = label_tag({ 'for' => input_options['id'] }.update(options.delete('label') || {}))
 				
 				options['class'] = options['class'] ? "#{options['class']} boolean_field" : 'boolean_field'
 				
@@ -124,9 +128,9 @@ module ActionView #:nodoc:
 		
 		class InstanceTag #:nodoc:
 			
-			def to_labelled_check_box_tag (caption = nil, label_options = {}, input_options = {}, div_options = {}, checked_value = "1", unchecked_value = "0")
+			def to_labelled_check_box_tag (label_options = {}, input_options = {}, div_options = {}, checked_value = "1", unchecked_value = "0")
 				check_box = to_check_box_tag(input_options, checked_value, unchecked_value)
-				label = to_label_tag(caption, label_options)
+				label = to_label_tag(label_options)
 				
 				div_options = div_options.stringify_keys
 				div_options['class'] = div_options['class'] ? "#{div_options['class']} boolean_field" : 'boolean_field'

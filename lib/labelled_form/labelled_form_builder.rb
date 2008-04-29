@@ -25,11 +25,15 @@ module ActionView #:nodoc:
 			# ERb evaluation block, not a ERb output block. So that's <% %>, not <%= %>.
       def field_for (*methods, &proc)
         options = methods.last.is_a?(Hash) ? methods.pop.stringify_keys : {}
+        if options['label'].respond_to?(:to_sym)
+          options['label'] = { 'caption' => options['label'] }
+        end
+        options['label'] ||= {}
         if methods.size == 1
-          options['input_id'] ||= "#{@object_name}_#{methods.first}"
+          options['label']['for'] ||= "#{@object_name}_#{methods.first}"
           options['id'] ||= "#{options['input_id']}_field"
         end
-				options['label'] ||= methods.first.to_s.humanize + ":"
+        options['label']['caption'] ||= methods.first.to_s.humanize + ':'
 				options['params'] = FormBuilder.new(@object_name, @object, @template, {}, proc)
 				options['wrap'] ||= [%{<span class="input">}, "</span>"]
         if @object.respond_to?(:errors) && methods.find {|method| @object.errors.on(method) }

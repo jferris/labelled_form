@@ -7,8 +7,10 @@ module ActionView #:nodoc:
 			# guessed using the attribute name, but you can specify one in the third
 			# <tt>caption</tt> parameter. Additional options can be passed as a hash
 			# with <tt>options</tt>.
-			def label (object_name, method, caption = nil, options = {})
-				InstanceTag.new(object_name, method, self, nil, options.delete(:object)).to_label_tag(caption, options)
+			def label (object_name, method, options = {})
+        options = options.stringify_keys
+        label_options = options.delete('label')
+				InstanceTag.new(object_name, method, self, nil, options.delete('object')).to_label_tag(label_options)
 			end
 			
 			# Creates a label tag.
@@ -19,23 +21,24 @@ module ActionView #:nodoc:
 			#   the contents of the label tag. If <tt>nil</tt>, the contents
 			#   will be guessed from <tt>element_id</tt>.
 			# <tt>options</tt>:: Any additional HTML attributes.
-			def label_tag (element_id, caption = nil, options = {})
-				caption = caption.respond_to?(:to_str) ? caption.to_s : (element_id.to_s.humanize + ":")
-				options["for"] ||= element_id.to_s unless element_id.nil?
-				content_tag("label", caption, options)
+			def label_tag (options = {})
+        if options.respond_to?(:to_sym)
+          options = { 'caption' => options }
+        else
+          options = options.stringify_keys
+          options["caption"] ||= options["for"].to_s.humanize + ':' unless options["for"].blank?
+        end
+				content_tag("label", options.delete("caption"), options)
 			end
 		end
 		
 		class InstanceTag #:nodoc:
 			
-			def to_label_tag (caption = nil, options = {})
-				options = options.stringify_keys
-				
-				caption = @method_name.humanize + ":" unless caption.is_a? String
-				
+			def to_label_tag (options = nil)
+        options = (options || {}).stringify_keys
+				options["caption"] ||= @method_name.humanize + ':'
 				options["for"] = @object_name + "_" + @method_name
-				
-				content_tag("label", caption, options)
+				content_tag("label", options.delete("caption"), options)
 			end
 			
 		end
@@ -46,8 +49,9 @@ module ActionView #:nodoc:
 			# Creates a label tag.
 			# 
 			# See LabelHelper#label
-			def label (method, caption = nil, options = {})
-				@template.label(@object_name, method, caption, options.merge(:object => @object))
+			def label (method, options = {})
+        options = options.stringify_keys
+				@template.label(@object_name, method, options.merge('object' => @object))
 			end
 			
 		end
